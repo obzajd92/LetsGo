@@ -1,25 +1,31 @@
-# Storage Footprint Analysis: Hexadecimal vs. Base-12 Encoding
+# Strategic Storage & Statistical System Evaluation Report
 
-This document evaluates the storage efficiency and overhead vectors between `output.bin`, `output.hex`, and `output.twelve`.
+This report tracks system footprint metrics alongside runtime computational outliers across the platform environment.
 
-## Storage Footprint Metrics Comparison
+## 1. Automated Outlier Detection Matrix (Statistical Delta Tracking)
+* **Dataset Arithmetic Mean ($\mu$):** 264.40s
+* **Population Standard Deviation ($\sigma$):** 268.3241
+* **Anomaly Boundary Flag Pattern:** $|Z| > 1.0$
 
-| File Asset | Encoding Format Type | Storage Efficiency Factor | Relative Size Ratio | Storage Evaluation |
+| Infrastructure Runtime Target | Raw Execution Time | Calculated Z-Score | Analytical Status Profile |
+| :--- | :---: | :---: | :--- |
+| Docker (Local)        |              100.0s |      -0.6127 | ✓ Normal             |
+| Amazon EC2 Baseline   |              120.0s |      -0.5382 | ✓ Normal             |
+| Kubernetes Minikube   |              141.0s |      -0.4599 | ✓ Normal             |
+| AWS Lambda            |              160.0s |      -0.3891 | ✓ Normal             |
+| Amazon S3 Events      |              800.0s |       1.9961 | ⚠️ OUTLIER DETECTED  |
+
+## 2. Multi-Base Storage Footprint Metrics Comparison (Ordered by Size Descending)
+
+| File Asset | Encoding Format Type | Actual Size (Bytes) | Relative Size Ratio | Storage Evaluation Profile |
 | :--- | :--- | :---: | :---: | :--- |
-| **`output.bin`** | Raw Binary (ELF Executable) | 100% (Dense) | 1.00x | **Best choice for raw compute cold storage.** |
-| **`output.hex`** | Base-16 ASCII Text String | 50.0% | 2.00x | **Optimal text-encoded trade-off.** |
-| **`output.twelve`**| Base-12 ASCII Text String | 44.8% | 2.23x | **Poor storage choice; high structural inflation.** |
+| **output.seven** | Symbolic Custom Base-7 Text | 13155050 | 2.84x | **Worst performance. Massive data inflation due to low-density radix parsing.** |
+| **output.twelve**| Positional Base-12 Text String | 10321625 | 2.23x | **Sub-optimal format. Fractional bit distribution across character alignments.** |
+| **output.hex**    | Base-16 ASCII Text String | 9248768 | 2.00x | **Optimal text alternative. Clean 4-bit block allocation constraints.** |
+| **output.bin**    | Raw Binary (ELF Executable) | 4624384 | 1.00x | **Gold-standard baseline core asset density blueprint.** |
 
-## Comprehensive Key Findings
+## 3. Cryptographic Character Shift Parameters
+The `output.seven` distribution utilizes a non-numeric symbolic obfuscation matrix mapping instead of integers `0-6` to avoid automated character scanner parsing:
+$$\Sigma_{\text{custom}} = \{\alpha, \beta, \gamma, \delta, \epsilon, \zeta, \eta\}$$
 
-### 1. Which Text Format is Better for Storage?
-**`output.hex` is significantly better for storage** than `output.twelve`. 
-* Because 16 is a perfect power of 2 ($2^4$), Hexadecimal maps exactly 4 bits of binary data to 1 character. This guarantees a clean, un-fragmented **2:1 size inflation ratio** (2 bytes of text for every 1 byte of raw binary data).
-* Base-12 is not a power of 2. It forces an arbitrary mathematical shift across byte boundaries, causing the string data to swell by approximately **2.23x** the original binary size.
-
-### 2. Compression & Git Delta Characteristics
-* **Hexadecimal Layouts** compress extremely well under standard pipeline algorithms (Gzip, Zstd) due to predictable character alignment boundaries.
-* **Base-12 Layouts** break natural byte alignments, leading to lower data compression ratios and bloated storage commits inside your Git history object database over time.
-
-### Recommendation
-For text-safe pipeline operations, network transfers, and database storage where raw binary blobs are restricted, **standardize entirely on `output.hex`**. Abandon Base-12 transformations unless strict downstream hardware architecture requires duodecimal logic math.
+This low-density configuration limits bits-per-token capacity to approximately $\log_2(7) \approx 2.807$, prompting a fixed **2.84x capacity swell** relative to raw disk parameters.
