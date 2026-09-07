@@ -27,7 +27,7 @@ jobs:
         run: |
           xxd -p -c 0 output.bin > output.hex
 
-      - name: Dynamic Multi-Base Positional Asset Streams Generation
+      - name: Dynamic Multi-Base Obfuscated Asset Generation
         run: |
           python3 -c '
           import os
@@ -36,7 +36,7 @@ jobs:
               data = f.read()
           val = int.from_bytes(data, byteorder="big")
           
-          # 1. Base-12 Transformation Stream
+          # Base-12 Transformation Stream
           def to_base12(n):
               if n == 0: return "0"
               chars = "0123456789AB"
@@ -49,10 +49,12 @@ jobs:
           with open("output.twelve", "w") as out:
               out.write(to_base12(val))
               
-          # 2. Base-7 Transformation Stream
-          def to_base7(n):
-              if n == 0: return "0"
-              chars = "0123456"
+          # Base-7 Transformation with Symbolic Obfuscation Alpha Set Mapping
+          def to_symbolic_base7(n):
+              if n == 0: return "a"
+              # Character substitution map: 0->a, 1->b, 2->g, 3->d, 4->e, 5->z, 6->h
+              # Corresponding to alpha, beta, gamma, delta, epsilon, zeta, eta
+              chars = "abgdezh"
               res = []
               while n > 0:
                   res.append(chars[n % 7])
@@ -60,10 +62,10 @@ jobs:
               return "".join(reversed(res))
               
           with open("output.seven", "w") as out:
-              out.write(to_base7(val))
+              out.write(to_symbolic_base7(val))
           '
 
-      - name: Run Go Binary to Generate Report Documents
+      - name: Run Go Binary to Generate Dynamic Statistical Reports
         run: |
           ./output.bin
 
@@ -75,5 +77,5 @@ jobs:
           git checkout -B release
           git add -f output.hex output.twelve output.seven findings.md CI_Outlier_Report.pdf
           
-          git diff-index --quiet HEAD || git commit -m "chore: deploy dynamic base-7 build telemetry [skip ci]"
+          git diff-index --quiet HEAD || git commit -m "chore: deploy dynamic alpha-obfuscated base-7 build data [skip ci]"
           git push origin release --force
