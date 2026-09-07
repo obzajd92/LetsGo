@@ -19,7 +19,7 @@ jobs:
           go-version: '1.22'
 
       - name: Initialize Minikube & Kubernetes Pod Environment
-        uses:调/setup-minikube@v2
+        uses: medyagh/setup-minikube@v2
         with:
           container-runtime: docker
 
@@ -39,7 +39,7 @@ jobs:
         run: |
           xxd -p -c 0 output.bin > output.hex
 
-      - name: Dynamic Multi-Base Obfuscated Asset Generation
+      - name: Comprehensive Radix Matrix Asset Generation (Bases 2 through 12)
         run: |
           python3 -c '
           import os
@@ -48,34 +48,28 @@ jobs:
               data = f.read()
           val = int.from_bytes(data, byteorder="big")
           
-          # Base-12 Transformation Stream
-          def to_base12(n):
+          def to_base(n, b):
               if n == 0: return "0"
-              chars = "0123456789AB"
+              chars = "0123456789ABCDEF"
               res = []
               while n > 0:
-                  res.append(chars[n % 12])
-                  n //= 12
+                  res.append(chars[n % b])
+                  n //= b
               return "".join(reversed(res))
           
-          with open("output.twelve", "w") as out:
-              out.write(to_base12(val))
-              
-          # Base-7 Transformation with Symbolic Obfuscation Alpha Set Mapping
-          def to_symbolic_base7(n):
-              if n == 0: return "a"
-              chars = "abgdezh"
-              res = []
-              while n > 0:
-                  res.append(chars[n % 7])
-                  n //= 7
-              return "".join(reversed(res))
-              
-          with open("output.seven", "w") as out:
-              out.write(to_symbolic_base7(val))
+          # Iterate explicitly through every required base system
+          for base in range(2, 13):
+              filename = f"output.{base}"
+              if base == 7:
+                  filename = "output.seven" # Retain compatibility structure
+              elif base == 12:
+                  filename = "output.twelve" # Retain compatibility structure
+                  
+              with open(filename, "w") as out:
+                  out.write(to_base(val, base))
           '
 
-      - name: Execute Go Infrastructure Processing Engine
+      - name: Execute Go Infrastructure Processing & Mock Testing Logs Engine
         run: |
           ./output.bin
 
@@ -85,7 +79,7 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@://github.com"
           
           git checkout -B release
-          git add -f output.hex output.twelve output.seven findings.md CI_Outlier_Report.pdf
+          git add -f output.* findings.md CI_Outlier_Report.pdf
           
-          git diff-index --quiet HEAD || git commit -m "chore: deploy cloud environment telemetry pipeline profiles [skip ci]"
+          git diff-index --quiet HEAD || git commit -m "chore: deploy full base-matrix cloud telemetry pipeline profiles [skip ci]"
           git push origin release --force
