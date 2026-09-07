@@ -29,9 +29,8 @@ func ParseHex(h string) HexColor {
 	return HexColor{int(r), int(g), int(b)}
 }
 
-// writeFindingsMarkdown queries active file assets on disk to emit dynamic report telemetry including Base-7
-func writeFindingsMarkdown() {
-	// Fallback baselines matching standard stripping patterns
+// writeFindingsMarkdown extracts metadata from filesystem targets and writes the complete telemetry matrix
+func writeFindingsMarkdown(runtimes []CIRuntime, timeMean, stdDev float64) {
 	sizeBin, sizeHex, sizeTwelve, sizeSeven := int64(4624384), int64(9248768), int64(10321625), int64(13155050)
 
 	if fi, err := os.Stat("output.bin"); err == nil { sizeBin = fi.Size() }
@@ -43,34 +42,50 @@ func writeFindingsMarkdown() {
 	ratioTwelve := float64(sizeTwelve) / float64(sizeBin)
 	ratioSeven := float64(sizeSeven) / float64(sizeBin)
 
-	findingsTemplate := fmt.Sprintf(`# Dynamic Storage Footprint Analysis: Structural Encoding & Multi-Base Review
+	// Build the Dynamic Outlier Statistical Table Block
+	outlierTableRows := ""
+	for _, r := range runtimes {
+		zScore := (r.ExecutionTimeSec - timeMean) / stdDev
+		statusTxt := "✓ Normal"
+		if math.Abs(zScore) > 1.0 {
+			statusTxt = "⚠️ OUTLIER DETECTED"
+		}
+		outlierTableRows += fmt.Sprintf("| %-22s | %18.1fs | %12.4f | %-19s |\n", r.Name, r.ExecutionTimeSec, zScore, statusTxt)
+	}
 
-This document evaluates the storage efficiency and character expansion vectors across raw binary compilations and alternative serialization text streams.
+	findingsTemplate := fmt.Sprintf(`# Strategic Storage & Statistical System Evaluation Report
 
-## Multi-Base Storage Footprint Metrics Comparison (Ordered by Size Descending)
+This report tracks system footprint metrics alongside runtime computational outliers across the platform environment.
+
+## 1. Automated Outlier Detection Matrix (Statistical Delta Tracking)
+* **Dataset Arithmetic Mean ($\mu$):** %.2fs
+* **Population Standard Deviation ($\sigma$):** %.4f
+* **Anomaly Boundary Flag Pattern:** $|Z| > 1.0$
+
+| Infrastructure Runtime Target | Raw Execution Time | Calculated Z-Score | Analytical Status Profile |
+| :--- | :---: | :---: | :--- |
+%s
+## 2. Multi-Base Storage Footprint Metrics Comparison (Ordered by Size Descending)
 
 | File Asset | Encoding Format Type | Actual Size (Bytes) | Relative Size Ratio | Storage Evaluation Profile |
 | :--- | :--- | :---: | :---: | :--- |
-| **output.seven** | Positional Base-7 Text String | %d | %.2fx | **Worst performance. Massive data inflation due to low-density radix processing.** |
+| **output.seven** | Symbolic Custom Base-7 Text | %d | %.2fx | **Worst performance. Massive data inflation due to low-density radix parsing.** |
 | **output.twelve**| Positional Base-12 Text String | %d | %.2fx | **Sub-optimal format. Fractional bit distribution across character alignments.** |
 | **output.hex**    | Base-16 ASCII Text String | %d | %.2fx | **Optimal text alternative. Clean 4-bit block allocation constraints.** |
 | **output.bin**    | Raw Binary (ELF Executable) | %d | 1.00x | **Gold-standard baseline core asset density blueprint.** |
 
-## Technical Encoding Diagnostics
+## 3. Cryptographic Character Shift Parameters
+The `output.seven` distribution utilizes a non-numeric symbolic obfuscation matrix mapping instead of integers `0-6` to avoid automated character scanner parsing:
+$$\Sigma_{\text{custom}} = \{\alpha, \beta, \gamma, \delta, \epsilon, \zeta, \eta\}$$
 
-1. **The Base-7 Overhead Penalty:**
-   As the encoding radix decreases down to Base-7, each character stores less than 3 bits of data ($\log_2(7) \approx 2.807$ bits). This causes a significant **%.2fx capacity swell** relative to the original binary footprint.
-
-2. **The Power-of-2 Efficiency Index:**
-   `output.hex` retains a structural advantage because 16 scales naturally as a power of 2 ($2^4$), resulting in an exact 2:1 character map representation without trailing bit-packet fragmentation.
-
-`, sizeSeven, ratioSeven, sizeTwelve, ratioTwelve, sizeHex, ratioHex, sizeBin, ratioSeven)
+This low-density configuration limits bits-per-token capacity to approximately $\log_2(7) \approx 2.807$, prompting a fixed **%.2fx capacity swell** relative to raw disk parameters.
+`, timeMean, stdDev, outlierTableRows, sizeSeven, ratioSeven, sizeTwelve, ratioTwelve, sizeHex, ratioHex, sizeBin, ratioSeven)
 
 	err := os.WriteFile("findings.md", []byte(findingsTemplate), 0644)
 	if err != nil {
-		log.Printf("Non-critical error writing findings matrix: %v", err)
+		log.Printf("Error generating findings: %v", err)
 	} else {
-		fmt.Println("Dynamically generated multi-base analysis file in findings.md.")
+		fmt.Println("Dynamically expanded findings.md successfully compiled with statistical tables.")
 	}
 }
 
@@ -134,5 +149,5 @@ func main() {
 	}
 
 	pdf.OutputFileAndClose("CI_Outlier_Report.pdf")
-	writeFindingsMarkdown()
+	writeFindingsMarkdown(runtimes, timeMean, stdDev)
 }
