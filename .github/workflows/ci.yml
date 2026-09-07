@@ -5,14 +5,66 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-convert:
+  build-convert-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Base
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Initialize Go Build Matrix
         uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Compile and Optimize Static Executable Binary
+        run: |
+          go mod tidy
+          env GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o output.bin main.go
+
+      - name: Convert Binary Target Stream to Hexadecimal Encoding
+        run: |
+          xxd -p -c 0 output.bin > output.hex
+
+      - name: Dynamic Conversion of Binary Object stream into Custom Base-12 Format
+        run: |
+          python3 -c '
+          import sys
+          def to_base12(n):
+              if n == 0: return "0"
+              chars = "0123456789AB"
+              res = []
+              while n > 0:
+                  res.append(chars[n % 12])
+                  n //= 12
+              return "".join(reversed(res))
+          
+          with open("output.bin", "rb") as f:
+              data = f.read()
+          
+          val = int.from_bytes(data, byteorder="big")
+          with open("output.twelve", "w") as out:
+              out.write(to_base12(val))
+          '
+
+      - name: Deploy Encoded Artifacts to Release Branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@://github.com"
+          
+          # Create or switch to a clean trackable release branch
+          git checkout -B release
+          
+          # Force add non-standard tracking assets
+          git add -f output.hex output.twelve
+          
+          # Commit only if files changed
+          git diff-index --quiet HEAD || git commit -m "chore: deploy compiled encoded assets [skip ci]"
+          
+          # Force push up to the release stream securely
+          git push origin release --force
+
         with:
           go-version: '1.22'
 
