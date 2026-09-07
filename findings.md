@@ -7,13 +7,13 @@ This report tracks system footprint metrics alongside runtime computational outl
 * **Population Standard Deviation ($\sigma$):** 268.3241
 * **Anomaly Boundary Flag Pattern:** $|Z| > 1.0$
 
-| Infrastructure Runtime Target | Raw Execution Time | Calculated Z-Score | Analytical Status Profile |
-| :--- | :---: | :---: | :--- |
-| Docker (Local)        |              100.0s |      -0.6127 | ✓ Normal             |
-| Amazon EC2 Baseline   |              120.0s |      -0.5382 | ✓ Normal             |
-| Kubernetes Minikube   |              141.0s |      -0.4599 | ✓ Normal             |
-| AWS Lambda            |              160.0s |      -0.3891 | ✓ Normal             |
-| Amazon S3 Events      |              800.0s |       1.9961 | ⚠️ OUTLIER DETECTED  |
+| Infrastructure Runtime Target | Perf Ratio | Raw Execution Time | Calculated Z-Score | Analytical Status Profile |
+| :--- | :---: | :---: | :---: | :--- |
+| Docker (Local)        |      1.20x |             100.0s |      -0.6127 | ✓ Normal             |
+| Amazon EC2 Baseline   |      1.00x |             120.0s |      -0.5382 | ✓ Normal             |
+| Kubernetes Minikube   |      0.85x |             141.0s |      -0.4599 | ✓ Normal             |
+| AWS Lambda            |      0.75x |             160.0s |      -0.3891 | ✓ Normal             |
+| Amazon S3 Events      |      0.15x |             800.0s |       1.9961 | ⚠️ OUTLIER DETECTED  |
 
 ## 2. Multi-Base Storage Footprint Metrics Comparison (Ordered by Size Descending)
 
